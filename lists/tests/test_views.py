@@ -5,6 +5,7 @@ from lists.views import home_page
 from lists.models import Item, List
 from django.template.loader import render_to_string
 from django.utils.html import escape
+from lists.forms import ItemForm
 
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
@@ -88,6 +89,10 @@ class ListViewTest(TestCase):
         self.assertContains(response, expected_error)
 
 class HomePageTest(TestCase):
-    def test_home_page_returns_correct_html(self):
+    def test_home_template(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response,'home.html')
+
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
