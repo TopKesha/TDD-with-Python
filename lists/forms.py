@@ -29,19 +29,18 @@ class ExistingListItemForm(ItemForm):
         try:
             self.instance.validate_unique()
         except ValidationError as e:
+     #       e.update_error_dict({'text': DUPLICATE_ITEM_ERROR})
             e.error_dict = {'text': [DUPLICATE_ITEM_ERROR]}
             self._update_errors(e)
+      #       self.add_error(None, DUPLICATE_ITEM_ERROR)
 
-    class Meta:
-        model = Item
-        fields = ('text',)
-        widgets = {'text': forms.fields.TextInput(attrs={
-            'placeholder': 'Enter a to-do item',
-            }),}
-        error_messages = {'list': {'required': DUPLICATE_ITEM_ERROR}, 'text': {'required': EMPTY_ITEM_ERROR}}
-    #   item_text = forms.CharField(
-  #      widget = forms.fields.TextInput(attrs={
-   #         'placeholder': 'Enter a to-do item',
-    #        'class': 'form-control input-lg',}
-     #                                   )
-      #  )
+    def save(self):
+        return forms.models.ModelForm.save(self)
+
+#    class Meta:
+ #       model = Item
+  #      fields = ('text',)
+   #     widgets = {'text': forms.fields.TextInput(attrs={
+    #        'placeholder': 'Enter a to-do item',
+     #       }),}
+      #  error_messages = {'list': {'required': DUPLICATE_ITEM_ERROR}, 'text': {'required': EMPTY_ITEM_ERROR}}
