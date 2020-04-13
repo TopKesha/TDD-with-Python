@@ -36,11 +36,3 @@ class ExistingListItemForm(ItemForm):
 
     def save(self):
         return forms.models.ModelForm.save(self)
-
-#    class Meta:
- #       model = Item
-  #      fields = ('text',)
-   #     widgets = {'text': forms.fields.TextInput(attrs={
-    #        'placeholder': 'Enter a to-do item',
-     #       }),}
-      #  error_messages = {'list': {'required': DUPLICATE_ITEM_ERROR}, 'text': {'required': EMPTY_ITEM_ERROR}}
