@@ -29,10 +29,11 @@ ALLOWED_HOSTS = ['superlists-staging-ottg.site', 'localhost']
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_HOST_USER = 'djangotestroma@yandex.ru'
-EMAIL_HOST_PASSWORD = 'lafxckctssubmcea'
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+LOGOUT_REDIRECT_URL = '/'
 # Application definition
 
 INSTALLED_APPS = [
