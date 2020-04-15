@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import auth
 import uuid
 
 class User(models.Model):

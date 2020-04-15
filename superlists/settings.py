@@ -23,10 +23,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'lk*d@1^rlp)qr@2pqk1k4hg8^7*6v+07gnu@scs*71+r$80l++'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['superlists-staging-ottg.site']
+ALLOWED_HOSTS = ['superlists-staging-ottg.site', 'localhost']
 
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'djangotestroma@yandex.ru'
+EMAIL_HOST_PASSWORD = 'lafxckctssubmcea'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Application definition
 
@@ -42,6 +47,9 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication.PasswordlessAuthenticationBackend',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
