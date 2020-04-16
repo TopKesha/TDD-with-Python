@@ -53,7 +53,7 @@ class LoginTest(FunctionalTest):
         inbox = poplib.POP3_SSL('pop.yandex.ru')
         try:
             inbox.user(test_email)
-            inbox.pass_(os.environ['YAN_PASSWORD'])
+            inbox.pass_(os.environ.get('EMAIL_PASSWORD'))
             while time.time() - start < 60:
                 # get 10 newest messages
                 count, _ = inbox.stat()
@@ -61,7 +61,6 @@ class LoginTest(FunctionalTest):
                     print('getting msg', i)
                     _, lines, __ = inbox.retr(i)
                     lines = [l.decode('utf8') for l in lines]
-                    print(lines)
                     if f'Subject: {subject}' in lines:
                         email_id = i
                         body = '\n'.join(lines)
