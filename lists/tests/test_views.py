@@ -8,6 +8,11 @@ from django.utils.html import escape
 from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm, DUPLICATE_ITEM_ERROR
 from unittest import skip
 
+class MyListsTest(TestCase):
+    def test_my_lists_url_renders_my_lists_template(self):
+        response = self.client.get('/lists/users/a@b.com/')
+        self.assertTemplateUsed(response, 'my_lists.html')
+
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
         list_ = List.objects.create()
