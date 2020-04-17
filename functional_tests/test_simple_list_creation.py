@@ -16,7 +16,7 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('To-Do', header_text)
 
-        self.assertEqual(inputbox.get_attribute('placeholder'),'Enter a to-do item')
+        self.assertEqual(self.browser.find_element_by_css_selector('.input-lg').get_attribute('placeholder'),'Enter a to-do item')
 
         self.add_list_item('Buy peacock feathers')
         self.add_list_item('Use peacock feathers to make a fly')   
