@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import resolve
 from django.http import HttpRequest
-from lists.views import home_page
+from lists.views import HomePageView
 from lists.models import Item, List
 from django.template.loader import render_to_string
 from django.utils.html import escape
@@ -188,6 +188,58 @@ class NewListViewIntegratedTest(TestCase):
         self.client.post('/lists/new', data={'text': 'new item'})
         list_ = List.objects.first()
         self.assertEqual(list_.owner, user)
+
+class ShareListTest(TestCase):
+    def test_post_redirects_to_list_page(self):
+        user = User.objects.create(email='a@b.com')
+        list_ = List.objects.create()
+
+        share_url = f'/lists/{list_.id}/share'
+        response = self.client.post(share_url, data={'sharee': 'a@b.com'})
+        self.assertRedirects(response, f'/lists/{list_.id}/')
+
+    def test_user_is_added_to_share_list_after_POST(self):
+        user = User.objects.create(email='a@b.com')
+        list_ = List.objects.create()
+
+        share_url = f'/lists/{list_.id}/share'
+        response = self.client.post(share_url, data={'sharee': 'a@b.com'})
+
+        self.assertIn(user, list_.shared_with.all())
+
+    def test_shows_users_list_is_shared_with(self):
+        user = User.objects.create(email='a@b.com')
+        list_ = List.objects.create()
+
+        share_url = f'/lists/{list_.id}/share'
+        response = self.client.post(share_url, data={'sharee': 'a@b.com'},follow=True)
+
+        self.assertContains(response, 'a@b.com')
+
+    def test_list_shows_owner(self):
+        user = User.objects.create(email='a@b.com')
+        self.client.force_login(user)
+        response = self.client.post('/lists/new', data={'text': 'new item'},follow=True)
+        self.assertContains(response, '<span id="id_list_owner">a@b.com</span>')
+
+    def test_adds_success_message(self):
+        user = User.objects.create(email='a@b.com')
+        list_ = List.objects.create()
+        response = self.client.post(f'/lists/{list_.id}/share',data = {'sharee': 'a@b.com'}, follow=True)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(message.message,"List shared")
+        self.assertEqual(message.tags, 'success')
+
+    def test_adds_error_message(self):
+        user = User.objects.create(email='a@b.com')
+        list_ = List.objects.create()
+        response = self.client.post(f'/lists/{list_.id}/share',data = {'sharee': 'a@b2.com'}, follow=True)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(message.message,"User doesn't exist")
+        self.assertEqual(message.tags, 'error')
+
 
 class HomePageTest(TestCase):
     def test_home_template(self):

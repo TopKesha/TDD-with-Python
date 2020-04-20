@@ -4,13 +4,15 @@ from lists.models import Item, List
 from lists.forms import ItemForm, ExistingListItemForm, NewListForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.views.generic import FormView, CreateView
+from django.contrib import messages
 
 User = get_user_model()
 
-
-# Create your views here.
-def home_page(request):
-    return render(request, 'home.html', {'form': ItemForm()})
+#generic django view
+class HomePageView(FormView):
+    template_name = 'home.html'
+    form_class = ItemForm
 
 def view_list(request, list_id):
     list_ = List.objects.get(id=list_id)
@@ -33,5 +35,16 @@ def my_lists(request, email):
     owner = User.objects.get(email=email)
     return render(request, 'my_lists.html', {'owner': owner})
 
-
-
+def share_list(request, list_id):
+    list_ = List.objects.get(id=list_id)
+    email = request.POST.get('sharee')
+    try:
+        user = User.objects.get(email=email)
+        list_.shared_with.add(user)
+        messages.success(request, "List shared")
+        return redirect(list_)
+    except User.DoesNotExist:
+        messages.error(request,"User doesn't exist")
+        return redirect(list_)
+    
+    

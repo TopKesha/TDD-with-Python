@@ -14,6 +14,18 @@ MAX_WAIT = 5
 
 SCREEN_DUMP_LOCATION = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'screendumps')
 
+def wait(fn):
+    def modified_fn(*args, **kwargs):
+        start_time=time.time()
+        while True:
+            try:
+                return fn(*args, **kwargs)
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
+    return modified_fn
+
 class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Chrome()
@@ -23,16 +35,17 @@ class FunctionalTest(StaticLiveServerTestCase):
             reset_database(self.staging_server)
 
     def tearDown(self):
-        if self._test_has_failed():
-            if not os.path.exists(SCREEN_DUMP_LOCATION):
-                os.makedirs(SCREEN_DUMP_LOCATION)
-            for ix, handle in enumerate(self.browser.window_handles):
-                self._windowid = ix
-                self.browser.switch_to_window(handle)
-                self.take_screenshot()
-                self.dump_html()
+  #      if self._test_has_failed():
+   #         if not os.path.exists(SCREEN_DUMP_LOCATION):
+    #            os.makedirs(SCREEN_DUMP_LOCATION)
+     #       for ix, handle in enumerate(self.browser.window_handles):
+      #          self._windowid = ix
+       #         self.browser.switch_to_window(handle)
+        #        self.take_screenshot()
+         #       self.dump_html()
         self.browser.quit()
         super().tearDown()
+
     def _test_has_failed(self):
         # slightly obscure but couldn't find a better way!
         return any(error for (method, error) in self._outcome.errors)
@@ -58,17 +71,7 @@ class FunctionalTest(StaticLiveServerTestCase):
             timestamp=timestamp
         )
 
-    def wait(fn):
-        def modified_fn(*args, **kwargs):
-            start_time=time.time()
-            while True:
-                try:
-                    return fn(*args, **kwargs)
-                except (AssertionError, WebDriverException) as e:
-                    if time.time() - start_time > MAX_WAIT:
-                        raise e
-                    time.sleep(0.5)
-        return modified_fn
+
 
     def add_list_item(self, item_text):
         num_rows = len(self.browser.find_elements_by_css_selector('#id_list_table tr'))
@@ -109,7 +112,7 @@ class FunctionalTest(StaticLiveServerTestCase):
             session_key = create_pre_authenticated_session(email)
         ## to set a cookie we need to first visit the domain.
         ## 404 pages load the quickest!
-        self.browser.get(self.live_server_url + "/404_no_such_url/")
+        self.browser.get(self.live_server_url)
         self.browser.add_cookie(dict(
             name=settings.SESSION_COOKIE_NAME,
             value=session_key,

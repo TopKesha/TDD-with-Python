@@ -2,6 +2,7 @@ from selenium import webdriver
 from .base import FunctionalTest
 from .list_page import ListPage
 from .my_lists_page import MyListsPage
+import time
 
 def quit_if_possible(browser):
     try: browser.quit()
@@ -20,6 +21,7 @@ class SharingTest(FunctionalTest):
         self.create_pre_authenticated_session('oniciferous@example.com')
         # Edith goes to the home page and starts a list
         self.browser = edith_browser
+        time.sleep(5)
         list_page = ListPage(self).add_list_item('Get help')
         # She notices a "Share this list" option
         share_box = list_page.get_share_box()
